@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Assistant</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      /* 🔥 Background Image */
+      background: url('https://images.unsplash.com/photo-1518770660439-4636190af475') no-repeat center center/cover;
+
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 10px black;
+    }
+
+    button {
+      padding: 20px 50px;
+      font-size: 22px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+
+      /* Glass effect */
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    #out {
+      margin-top: 20px;
+      font-size: 20px;
+      text-shadow: 1px 1px 5px black;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🎤 Voice Assistant</h1>
+
+<button onclick="startConversation()">Start Assistant</button>
+
+<p id="out">Click the button to begin...</p>
+
+<script>
+function speak(text) {
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.rate = 1;
+  speech.pitch = 1;
+  window.speechSynthesis.speak(speech);
+}
+
+function listen(callback) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+
+  recognition.start();
+
+  document.getElementById("out").innerText = "Listening...";
+
+  recognition.onresult = function(event) {
+    const text = event.results[0][0].transcript;
+    document.getElementById("out").innerText = "You said: " + text;
+    callback(text.toLowerCase());
+  };
+
+  recognition.onerror = function() {
+    speak("Sorry, I could not hear you clearly.");
+  };
+}
+
+function startConversation() {
+  speak("Hi, how are you doing today?");
+  document.getElementById("out").innerText = "Hi, how are you doing today?";
+
+  setTimeout(() => {
+    listen(handleMood);
+  }, 2500);
+}
+
+function handleMood(reply) {
+  if (reply.includes("good") || reply.includes("fine")) {
+    speak("Great! What do you want me to search?");
+  } else {
+    speak("I hope your day gets better. What do you want me to search?");
+  }
+
+  document.getElementById("out").innerText = "What do you want me to search?";
+
+  setTimeout(() => {
+    listen(handleSearch);
+  }, 3000);
+}
+
+function handleSearch(query) {
+  speak("Searching for " + query);
+
+  setTimeout(() => {
+    window.location.href =
+      "https://www.google.com/search?q=" + encodeURIComponent(query);
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
